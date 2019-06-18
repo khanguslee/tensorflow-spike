@@ -11,6 +11,34 @@ from tensorflow import keras
 import numpy as np
 import matplotlib.pyplot as plt
 
+def plot_image(prediction, real_label, img):
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+    plt.imshow(img, cmap=plt.cm.binary)
+
+    predicted_label = np.argmax(prediction)
+    if predicted_label == real_label:
+        color = 'blue'
+    else:
+        color = 'red'
+
+    plt.xlabel("{} {:2.0f}% ({})".format(class_names[predicted_label],
+                                            100*np.max(predictions),
+                                            class_names[real_label],
+                                            color=color))
+
+def plot_value(prediction, real_label):
+    plt.grid(False)
+    plt.xticks([])
+    plt.yticks([])
+    thisplot = plt.bar(range(10), prediction, color="#777777")
+    plt.ylim([0,1])
+    predicted_label = np.argmax(prediction)
+
+    thisplot[predicted_label].set_color('red')
+    thisplot[real_label].set_color('blue')
+
 # Load the dataset
 fashion_mnist = keras.datasets.fashion_mnist
 (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
@@ -44,3 +72,14 @@ test_loss, test_accuracy = model.evaluate(test_images, test_labels)
 print('Test Accuracy: ', test_accuracy)
 
 predictions = model.predict(test_images)
+
+num_rows = 5
+num_cols = 3
+num_images = num_cols * num_rows
+plt.figure(figsize=(2*2*num_cols, 2*num_rows))
+for i in range(num_images):
+    plt.subplot(num_rows, 2*num_cols, 2*i+1)
+    plot_image(predictions[i], test_labels[i], test_images[i])
+    plt.subplot(num_rows, 2*num_cols, 2*i+2)
+    plot_value(predictions[i], test_labels[i])
+plt.show()
